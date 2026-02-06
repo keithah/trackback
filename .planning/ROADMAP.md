@@ -118,9 +118,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [x] 06-01-PLAN.md — B2 storage integration for uploads
-- [ ] 06-02-PLAN.md — Self-host deployment with Docker Compose
-- [ ] 06-03-PLAN.md — Ops docs + env template
+ - [x] 06-01-PLAN.md — B2 storage integration for uploads
+ - [x] 06-02-PLAN.md — Self-host deployment with Docker Compose
+ - [ ] 06-03-PLAN.md — Ops docs + env template
 
 ### Phase 7: Advanced Audio Analysis (Essentia.js)
 **Goal**: Rich audio analysis features are derived from uploads using Essentia.js for deeper insights.
@@ -147,5 +147,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Timeline Feedback | 3/3 | Complete | 2026-02-06 |
 | 4. Version History & Sessions | 3/3 | Complete | 2026-02-06 |
 | 5. Chat & Production Notes | 3/3 | Complete | 2026-02-06 |
-| 6. Hosting & Media Storage | 1/3 | In progress | - |
+| 6. Hosting & Media Storage | 2/3 | In progress | - |
 | 7. Advanced Audio Analysis (Essentia) | 0/TBD | Not started | - |
