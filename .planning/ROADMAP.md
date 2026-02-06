@@ -51,10 +51,12 @@ Plans:
   3. User can play uploaded demos in the track view.
   4. User can see a waveform and extracted audio metadata for each demo.
   5. User can add an external audio link for a version instead of uploading.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [x] 02-01-PLAN.md — Add version media model + upload/link APIs
+- [x] 02-02-PLAN.md — Build upload UI with progress + version list
+- [x] 02-03-PLAN.md — Add waveform playback + metadata UI
 
 ### Phase 3: Timeline Feedback
 **Goal**: Users can review demos in context with chronological, realtime feedback
@@ -65,10 +67,12 @@ Plans:
   2. User can leave a comment at a specific timestamp on a demo.
   3. User can see new comments appear in realtime without refresh.
   4. User can read the full message history for a track.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [x] 03-01-PLAN.md — Add comment model + APIs
+- [x] 03-02-PLAN.md — Timeline UI + timestamped composer
+- [x] 03-03-PLAN.md — Realtime-ish updates via polling
 
 ### Phase 4: Version History & Sessions
 **Goal**: Users can understand and manage version history with trusted comparisons
@@ -79,10 +83,12 @@ Plans:
   2. User can compare two versions with synced playback.
   3. User can mark a previous version as the current working version.
   4. User can click "Save Session" to create a session milestone in history.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [x] 04-01-PLAN.md — Add current version + session metadata
+- [x] 04-02-PLAN.md — Version list + compare UI
+- [x] 04-03-PLAN.md — Session milestones API + UI
 
 ### Phase 5: Chat & Production Notes
 **Goal**: Users can coordinate in chat and turn discussion into saved notes
@@ -94,10 +100,40 @@ Plans:
   3. User receives in-app notifications for new demos or comments.
   4. User can generate production notes from conversation history for a version.
   5. User can edit generated production notes before saving to the track.
+**Plans**: 3 plans
+
+Plans:
+- [x] 05-01-PLAN.md — Chat model + API
+- [x] 05-02-PLAN.md — Chat UI panel on project page
+- [x] 05-03-PLAN.md — Production notes generator + editor
+
+### Phase 6: Hosting & Media Storage
+**Goal**: Production hosting and media storage are configured with deployment automation and upload pathways.
+**Depends on**: Phase 2
+**Requirements**: DEPLOY-01, DEPLOY-02, STORAGE-01, STORAGE-02
+**Success Criteria** (what must be TRUE):
+  1. The app is deployed to a managed platform with environment variables and database configured.
+  2. Media uploads store files in B2 (or compatible object storage) and return playable URLs.
+  3. Deployments are reproducible from the repository with documented steps.
+**Plans**: 3 plans
+
+Plans:
+- [x] 06-01-PLAN.md — B2 storage integration for uploads
+- [ ] 06-02-PLAN.md — Self-host deployment with Docker Compose
+- [ ] 06-03-PLAN.md — Ops docs + env template
+
+### Phase 7: Advanced Audio Analysis (Essentia.js)
+**Goal**: Rich audio analysis features are derived from uploads using Essentia.js for deeper insights.
+**Depends on**: Phase 2
+**Requirements**: AUDIO-01, AUDIO-02, AUDIO-03
+**Success Criteria** (what must be TRUE):
+  1. Uploaded audio is analyzed via Essentia and stored with the version.
+  2. Users can view advanced audio analysis fields in the track view.
+  3. Analysis runs asynchronously without blocking uploads.
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 07-01: TBD
 
 ## Progress
 
@@ -107,7 +143,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Projects & Access | 7/7 | Complete | 2026-02-06 |
-| 2. Media Ingest & Playback | 0/TBD | Not started | - |
-| 3. Timeline Feedback | 0/TBD | Not started | - |
-| 4. Version History & Sessions | 0/TBD | Not started | - |
-| 5. Chat & Production Notes | 0/TBD | Not started | - |
+| 2. Media Ingest & Playback | 3/3 | Complete | 2026-02-06 |
+| 3. Timeline Feedback | 3/3 | Complete | 2026-02-06 |
+| 4. Version History & Sessions | 3/3 | Complete | 2026-02-06 |
+| 5. Chat & Production Notes | 3/3 | Complete | 2026-02-06 |
+| 6. Hosting & Media Storage | 1/3 | In progress | - |
+| 7. Advanced Audio Analysis (Essentia) | 0/TBD | Not started | - |
