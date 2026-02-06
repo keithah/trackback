@@ -5,6 +5,8 @@ import { prisma } from "@/db/prisma";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectCreateModal from "@/components/ProjectCreateModal";
 
+export const dynamic = "force-dynamic";
+
 async function requireUserId() {
   const session = await auth();
 

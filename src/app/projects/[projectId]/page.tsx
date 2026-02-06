@@ -7,6 +7,8 @@ import TrackCreateModal from "@/components/TrackCreateModal";
 import InviteModal from "@/components/InviteModal";
 import ProjectChatPanel from "@/components/ProjectChatPanel";
 
+export const dynamic = "force-dynamic";
+
 type TrackStatus = "DEMO" | "MIXING" | "MASTERED" | "RELEASED";
 
 async function requireUserId() {

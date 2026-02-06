@@ -13,6 +13,8 @@ import CommentSection from "@/components/CommentSection";
 import SessionMilestones from "@/components/SessionMilestones";
 import ProductionNotesPanel from "@/components/ProductionNotesPanel";
 
+export const dynamic = "force-dynamic";
+
 type TrackStatus = "DEMO" | "MIXING" | "MASTERED" | "RELEASED";
 
 async function requireUserId() {
