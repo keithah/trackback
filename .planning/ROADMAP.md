@@ -30,10 +30,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can set and view each track's status (demo, mixing, mastered, released).
   4. User can invite collaborators to a project by email or username.
   5. Only the project owner can delete tracks or versions.
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Decide v1 authentication method
+- [ ] 01-02-PLAN.md — Scaffold Next.js app with Tailwind baseline
+- [ ] 01-03-PLAN.md — Add Prisma schema and Auth.js configuration
+- [ ] 01-04-PLAN.md — Implement project/track/invite API routes
+- [ ] 01-05-PLAN.md — Create Phase 1 UI shell and sign-in
+- [ ] 01-06-PLAN.md — Build project dashboard, tracks, and invites UI
 
 ### Phase 2: Media Ingest & Playback
 **Goal**: Users can upload or link demos and play them with rich audio context
