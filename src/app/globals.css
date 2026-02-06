@@ -3,7 +3,60 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-bg: #f6f1ea;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f2ece3;
+    --color-text: #1c1a17;
+    --color-text-muted: #6f655b;
+    --color-accent: #e0712f;
+    --color-accent-strong: #b85523;
+    --color-border: #e4ddd2;
+    --color-accent-glow: rgba(224, 113, 47, 0.25);
+    --shadow-soft: 0 18px 40px rgba(22, 18, 14, 0.12);
+  }
+
   body {
-    @apply bg-white text-slate-900 antialiased;
+    font-family: var(--font-body), "Work Sans", system-ui, sans-serif;
+    background: radial-gradient(
+        1100px 500px at 10% -10%,
+        rgba(224, 113, 47, 0.2),
+        transparent 60%
+      ),
+      radial-gradient(
+        900px 500px at 90% 0%,
+        rgba(54, 93, 122, 0.18),
+        transparent 55%
+      ),
+      linear-gradient(180deg, #f8f3ec 0%, #f2ece3 50%, #f8f3ed 100%);
+    color: var(--color-text);
+    min-height: 100%;
+  }
+
+  ::selection {
+    background: rgba(224, 113, 47, 0.25);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  .font-display {
+    font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .surface-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .surface-muted {
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
   }
 }
