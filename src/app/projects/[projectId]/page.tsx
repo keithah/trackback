@@ -5,6 +5,7 @@ import { prisma } from "@/db/prisma";
 import TrackCard from "@/components/TrackCard";
 import TrackCreateModal from "@/components/TrackCreateModal";
 import InviteModal from "@/components/InviteModal";
+import ProjectChatPanel from "@/components/ProjectChatPanel";
 
 type TrackStatus = "DEMO" | "MIXING" | "MASTERED" | "RELEASED";
 
@@ -15,7 +16,7 @@ async function requireUserId() {
     redirect("/signin");
   }
 
-  const directId = session.user.id;
+  const directId = (session.user as { id?: string }).id;
 
   if (directId) {
     return directId;
@@ -43,15 +44,17 @@ export default async function ProjectPage({
   params,
   searchParams
 }: {
-  params: { projectId: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ projectId: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { projectId } = await params;
+  const resolvedSearchParams = await searchParams;
   const userId = await requireUserId();
 
   const membership = await prisma.membership.findUnique({
     where: {
       projectId_userId: {
-        projectId: params.projectId,
+        projectId,
         userId
       }
     },
@@ -63,7 +66,7 @@ export default async function ProjectPage({
   }
 
   const project = await prisma.project.findUnique({
-    where: { id: params.projectId },
+    where: { id: projectId },
     select: {
       id: true,
       name: true,
@@ -80,6 +83,7 @@ export default async function ProjectPage({
     id: string;
     name: string;
     status: TrackStatus;
+    url: string | null;
     updatedAt: Date;
     versions: Array<{
       id: string;
@@ -87,12 +91,13 @@ export default async function ProjectPage({
       createdAt: Date;
     }>;
   }> = await prisma.track.findMany({
-    where: { projectId: params.projectId },
+    where: { projectId },
     orderBy: { updatedAt: "desc" },
     select: {
       id: true,
       name: true,
       status: true,
+      url: true,
       updatedAt: true,
       versions: {
         select: {
@@ -112,7 +117,7 @@ export default async function ProjectPage({
   const finishedTracks = tracks.filter(
     (track) => track.status === "MASTERED" || track.status === "RELEASED"
   );
-  const shouldOpenTrackModal = searchParams?.created === "1";
+  const shouldOpenTrackModal = resolvedSearchParams?.created === "1";
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 py-12">
@@ -156,6 +161,7 @@ export default async function ProjectPage({
                     projectId={project.id}
                     name={track.name}
                     status={track.status}
+                    url={track.url}
                     updatedAt={track.updatedAt}
                     latestVersion={track.versions[0] ?? null}
                   />
@@ -183,6 +189,7 @@ export default async function ProjectPage({
                     projectId={project.id}
                     name={track.name}
                     status={track.status}
+                    url={track.url}
                     updatedAt={track.updatedAt}
                     latestVersion={track.versions[0] ?? null}
                   />
@@ -193,6 +200,15 @@ export default async function ProjectPage({
                 Finished tracks will appear once they are mastered or released.
               </p>
             )}
+          </section>
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-2xl font-semibold">Chat</h2>
+              <span className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]">
+                Project conversation
+              </span>
+            </div>
+            <ProjectChatPanel projectId={project.id} />
           </section>
         </div>
       ) : (

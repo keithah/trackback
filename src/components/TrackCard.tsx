@@ -8,6 +8,7 @@ type TrackCardProps = {
   name: string;
   status: TrackStatus;
   updatedAt: Date | string;
+  url?: string | null;
   latestVersion?: {
     name: string;
     createdAt: Date | string;
@@ -44,15 +45,18 @@ export default function TrackCard({
   projectId,
   name,
   status,
+  url,
   updatedAt,
   latestVersion
 }: TrackCardProps) {
   return (
-    <Link
-      href={`/projects/${projectId}/tracks/${id}`}
-      className="surface-card group flex h-full flex-col justify-between gap-6 px-6 py-5 transition duration-200 hover:-translate-y-1 hover:border-[color:var(--color-accent)]"
-    >
-      <div className="space-y-3">
+    <div className="surface-card group relative flex h-full flex-col justify-between gap-6 px-6 py-5 transition duration-200 hover:-translate-y-1 hover:border-[color:var(--color-accent)]">
+      <Link
+        href={`/projects/${projectId}/tracks/${id}`}
+        aria-label={`Open ${name}`}
+        className="absolute inset-0"
+      />
+      <div className="relative z-10 space-y-3">
         <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]">
           Track
         </p>
@@ -60,13 +64,23 @@ export default function TrackCard({
           {name}
         </h3>
       </div>
-      <div className="space-y-2 text-xs">
+      <div className="relative z-10 space-y-2 text-xs">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span
             className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.2em] ${statusBadge[status]}`}
           >
             {statusLabels[status]}
           </span>
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border border-[color:var(--color-border)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] transition hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-text)]"
+            >
+              Play
+            </a>
+          ) : null}
           <span className="text-[color:var(--color-text-muted)]">
             Updated {formatDate(updatedAt)}
           </span>
@@ -82,6 +96,6 @@ export default function TrackCard({
           </span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import { z } from "zod"
 export const trackCreateSchema = z.object({
   name: z.string().trim().min(1).max(120),
   notes: z.string().trim().min(1).max(2000).optional(),
+  url: z.string().trim().url().optional(),
   status: z.nativeEnum(TrackStatus).optional(),
 })
 

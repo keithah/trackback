@@ -21,7 +21,7 @@ export default function SignInPage() {
         <div className="mt-8 space-y-4">
           <button
             type="button"
-            onClick={() => signIn("github")}
+            onClick={() => signIn("github", { callbackUrl: "/" })}
             className="w-full rounded-full bg-[color:var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[color:var(--color-accent-glow)] transition duration-200 hover:-translate-y-0.5 hover:bg-[color:var(--color-accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]"
           >
             Continue with GitHub

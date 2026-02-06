@@ -12,7 +12,7 @@ async function requireUserId() {
     redirect("/signin");
   }
 
-  const directId = session.user.id;
+  const directId = (session.user as { id?: string }).id;
 
   if (directId) {
     return directId;

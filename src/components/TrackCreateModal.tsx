@@ -18,6 +18,7 @@ export default function TrackCreateModal({
   const [open, setOpen] = useState(defaultOpen);
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
+  const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +31,7 @@ export default function TrackCreateModal({
   const resetForm = () => {
     setName("");
     setNotes("");
+    setUrl("");
     setError(null);
     setIsSubmitting(false);
   };
@@ -55,7 +57,8 @@ export default function TrackCreateModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          notes: notes.trim() || undefined
+          notes: notes.trim() || undefined,
+          url: url.trim() || undefined
         })
       });
 
@@ -139,6 +142,16 @@ export default function TrackCreateModal({
                   rows={4}
                   className="mt-2 w-full rounded-2xl border border-[color:var(--color-border)] bg-white px-4 py-3 text-sm text-[color:var(--color-text)] shadow-sm focus:border-[color:var(--color-accent)] focus:outline-none"
                   placeholder="Capture the latest tweaks, references, or goals."
+                />
+              </label>
+              <label className="block text-sm font-medium text-[color:var(--color-text)]">
+                Audio link (optional)
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(event) => setUrl(event.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-[color:var(--color-border)] bg-white px-4 py-3 text-sm text-[color:var(--color-text)] shadow-sm focus:border-[color:var(--color-accent)] focus:outline-none"
+                  placeholder="https://soundcloud.com/..."
                 />
               </label>
               {error ? (

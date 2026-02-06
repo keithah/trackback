@@ -7,6 +7,11 @@ import TrackStatusSelect, {
   TrackDeleteButton,
   VersionDeleteButton
 } from "@/components/TrackStatusSelect";
+import VersionList from "@/components/VersionList";
+import VersionUploadPanel from "@/components/VersionUploadPanel";
+import CommentSection from "@/components/CommentSection";
+import SessionMilestones from "@/components/SessionMilestones";
+import ProductionNotesPanel from "@/components/ProductionNotesPanel";
 
 type TrackStatus = "DEMO" | "MIXING" | "MASTERED" | "RELEASED";
 
@@ -17,7 +22,7 @@ async function requireUserId() {
     redirect("/signin");
   }
 
-  const directId = session.user.id;
+  const directId = (session.user as { id?: string }).id;
 
   if (directId) {
     return directId;
@@ -44,14 +49,15 @@ async function requireUserId() {
 export default async function TrackPage({
   params
 }: {
-  params: { projectId: string; trackId: string };
+  params: Promise<{ projectId: string; trackId: string }>;
 }) {
+  const { projectId, trackId } = await params;
   const userId = await requireUserId();
 
   const membership = await prisma.membership.findUnique({
     where: {
       projectId_userId: {
-        projectId: params.projectId,
+        projectId,
         userId
       }
     },
@@ -64,23 +70,34 @@ export default async function TrackPage({
 
   const track = await prisma.track.findFirst({
     where: {
-      id: params.trackId,
-      projectId: params.projectId
+      id: trackId,
+      projectId
     },
     select: {
       id: true,
       name: true,
       notes: true,
+      productionNotes: true,
+      url: true,
       status: true,
       updatedAt: true,
       versions: {
         select: {
           id: true,
           name: true,
+          notes: true,
+          audioUrl: true,
+          audioMime: true,
+          audioDurationSeconds: true,
+          audioSampleRate: true,
+          audioBitrateKbps: true,
+          audioSource: true,
+          isCurrent: true,
+          sessionLabel: true,
+          sessionCreatedAt: true,
           createdAt: true
         },
-        orderBy: { createdAt: "desc" },
-        take: 1
+        orderBy: { createdAt: "desc" }
       },
       project: {
         select: { name: true }
@@ -98,7 +115,7 @@ export default async function TrackPage({
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-12">
       <Link
-        href={`/projects/${params.projectId}`}
+        href={`/projects/${projectId}`}
         className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]"
       >
         Back to {track.project.name}
@@ -114,7 +131,7 @@ export default async function TrackPage({
             </h1>
           </div>
           <TrackStatusSelect
-            projectId={params.projectId}
+            projectId={projectId}
             trackId={track.id}
             status={track.status as TrackStatus}
           />
@@ -128,6 +145,30 @@ export default async function TrackPage({
               ? track.notes
               : "No notes added yet. Capture the latest requests or creative decisions."}
           </p>
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
+            Audio link
+          </h2>
+          {track.url ? (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <a
+                href={track.url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-[color:var(--color-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-text)] transition hover:border-[color:var(--color-accent)]"
+              >
+                Play audio
+              </a>
+              <span className="text-xs text-[color:var(--color-text-muted)]">
+                {track.url}
+              </span>
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-[color:var(--color-text-muted)]">
+              No audio link added.
+            </p>
+          )}
         </div>
         <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -152,7 +193,7 @@ export default async function TrackPage({
             </div>
             {isOwner && latestVersion ? (
               <VersionDeleteButton
-                projectId={params.projectId}
+                projectId={projectId}
                 trackId={track.id}
                 versionId={latestVersion.id}
                 versionName={latestVersion.name}
@@ -160,10 +201,42 @@ export default async function TrackPage({
             ) : null}
           </div>
         </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <VersionUploadPanel projectId={projectId} trackId={track.id} />
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <VersionList
+            projectId={projectId}
+            trackId={track.id}
+            isOwner={isOwner}
+            versions={track.versions}
+          />
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <ProductionNotesPanel
+            projectId={projectId}
+            trackId={track.id}
+            initialNotes={track.productionNotes}
+          />
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <SessionMilestones
+            projectId={projectId}
+            trackId={track.id}
+            isOwner={isOwner}
+          />
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <CommentSection
+            projectId={projectId}
+            trackId={track.id}
+            defaultVersionId={latestVersion?.id}
+          />
+        </div>
         {isOwner ? (
           <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
             <TrackDeleteButton
-              projectId={params.projectId}
+              projectId={projectId}
               trackId={track.id}
             />
           </div>

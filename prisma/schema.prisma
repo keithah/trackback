@@ -25,6 +25,11 @@ enum InviteStatus {
   EXPIRED
 }
 
+enum AudioSource {
+  UPLOAD
+  EXTERNAL
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String?
@@ -35,6 +40,8 @@ model User {
   sessions      Session[]
   memberships   Membership[]
   invitesSent   Invite[]     @relation("InvitedBy")
+  comments      Comment[]
+  chatMessages  ChatMessage[]
 }
 
 model Account {
@@ -81,6 +88,7 @@ model Project {
   memberships        Membership[]
   tracks             Track[]
   invites            Invite[]
+  chatMessages       ChatMessage[]
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
 }
@@ -104,12 +112,15 @@ model Track {
   projectId String
   name      String
   notes     String?
+  url       String?
+  productionNotes String?
   status    TrackStatus @default(DEMO)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   versions Version[]
+  comments Comment[]
 
   @@unique([projectId, name])
 }
@@ -118,10 +129,38 @@ model Version {
   id        String   @id @default(cuid())
   trackId   String
   name      String
+  notes     String?
+  audioUrl  String?
+  audioPath String?
+  audioMime String?
+  audioDurationSeconds Float?
+  audioSampleRate      Int?
+  audioBitrateKbps      Int?
+  audioSource AudioSource?
+  isCurrent Boolean @default(false)
+  sessionLabel String?
+  sessionCreatedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  comments Comment[]
+}
+
+model Comment {
+  id               String   @id @default(cuid())
+  trackId          String
+  versionId        String?
+  userId           String
+  body             String
+  timestampSeconds Int
+  createdAt        DateTime @default(now())
+
+  track   Track   @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  version Version? @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([trackId, createdAt])
 }
 
 model Invite {
@@ -138,4 +177,17 @@ model Invite {
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   invitedBy User    @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
 }
