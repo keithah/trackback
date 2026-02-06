@@ -7,16 +7,13 @@ import { prisma } from "@/db/prisma";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
-  debug: process.env.NEXTAUTH_DEBUG === "true",
+  debug: process.env.NODE_ENV !== "production" && process.env.NEXTAUTH_DEBUG === "true",
   logger: {
-    error(code, metadata) {
-      console.error("next-auth error", code, metadata);
+    error(code) {
+      console.error("next-auth error", code);
     },
     warn(code) {
       console.warn("next-auth warn", code);
-    },
-    debug(code, metadata) {
-      console.debug("next-auth debug", code, metadata);
     }
   },
   adapter: PrismaAdapter(prisma),
