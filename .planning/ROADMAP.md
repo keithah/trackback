@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 6 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Decide v1 authentication method
+- [x] 01-01-PLAN.md — Decide v1 authentication method
 - [x] 01-02-PLAN.md — Scaffold Next.js app with Tailwind baseline
 - [ ] 01-03-PLAN.md — Add Prisma schema and Auth.js configuration
 - [ ] 01-04-PLAN.md — Implement project/track/invite API routes
@@ -105,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Projects & Access | 1/6 | In progress | 2026-02-06 |
+| 1. Projects & Access | 2/6 | In progress | 2026-02-06 |
 | 2. Media Ingest & Playback | 0/TBD | Not started | - |
 | 3. Timeline Feedback | 0/TBD | Not started | - |
 | 4. Version History & Sessions | 0/TBD | Not started | - |
