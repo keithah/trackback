@@ -12,7 +12,7 @@ Trackback ships a web-first workflow that lets collaborators move from demo uplo
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Projects & Access** - Create projects/tracks and control collaborator access
+- [x] **Phase 1: Projects & Access** - Create projects/tracks and control collaborator access
 - [ ] **Phase 2: Media Ingest & Playback** - Upload demos and make them playable with metadata
 - [ ] **Phase 3: Timeline Feedback** - Review demos with timestamped, realtime comments
 - [ ] **Phase 4: Version History & Sessions** - Track versions, compare, and capture milestones
@@ -38,7 +38,7 @@ Plans:
 - [x] 01-03-PLAN.md — Add Prisma schema and Auth.js configuration
 - [x] 01-04-PLAN.md — Implement project/track/invite API routes
 - [x] 01-05-PLAN.md — Create Phase 1 UI shell and sign-in
-- [ ] 01-06-PLAN.md — Build project dashboard, tracks, and invites UI
+- [x] 01-06-PLAN.md — Build project dashboard, tracks, and invites UI
 
 ### Phase 2: Media Ingest & Playback
 **Goal**: Users can upload or link demos and play them with rich audio context
@@ -105,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Projects & Access | 5/6 | In progress | 2026-02-06 |
+| 1. Projects & Access | 6/6 | Complete | 2026-02-06 |
 | 2. Media Ingest & Playback | 0/TBD | Not started | - |
 | 3. Timeline Feedback | 0/TBD | Not started | - |
 | 4. Version History & Sessions | 0/TBD | Not started | - |
