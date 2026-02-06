@@ -99,16 +99,22 @@ export async function POST(
     const name = formData.get("name");
     const notes = formData.get("notes");
 
-    if (!(file instanceof File)) {
+    if (!file || typeof (file as { arrayBuffer?: unknown }).arrayBuffer !== "function") {
       return jsonError("File is required", 400);
     }
 
-    if (file.type && !allowedMimeTypes.has(file.type)) {
+    const fileValue = file as {
+      arrayBuffer: () => Promise<ArrayBuffer>;
+      type?: string;
+      name?: string;
+    };
+
+    if (fileValue.type && !allowedMimeTypes.has(fileValue.type)) {
       return jsonError("Unsupported file type", 400);
     }
 
     const versionName =
-      typeof name === "string" && name.trim() ? name.trim() : file.name;
+      typeof name === "string" && name.trim() ? name.trim() : fileValue.name;
     const versionNotes =
       typeof notes === "string" && notes.trim() ? notes.trim() : undefined;
 
@@ -121,16 +127,16 @@ export async function POST(
       return jsonError("Not found", 404);
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const metadata = await extractMetadata(buffer, file.type || null);
+    const buffer = Buffer.from(await fileValue.arrayBuffer());
+    const metadata = await extractMetadata(buffer, fileValue.type || null);
     const versionId = randomUUID();
     const stored = await uploadToB2({
       projectId,
       trackId,
       versionId,
-      filename: file.name || "audio",
+      filename: fileValue.name || "audio",
       body: buffer,
-      contentType: file.type || null,
+      contentType: fileValue.type || null,
     });
     const transactionResult = await prisma.$transaction([
       prisma.version.updateMany({
