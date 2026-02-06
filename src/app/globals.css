@@ -4,6 +4,6 @@
 
 @layer base {
   body {
-    @apply bg-white text-slate-900;
+    @apply bg-white text-slate-900 antialiased;
   }
 }
