@@ -53,8 +53,8 @@ function getB2Config(): B2Config {
     applicationKey: requireEnv("B2_APPLICATION_KEY"),
     bucketId: requireEnv("B2_BUCKET_ID"),
     bucketName: requireEnv("B2_BUCKET_NAME"),
-    region: DEFAULT_REGION,
-    endpoint: DEFAULT_ENDPOINT,
+    region: process.env.B2_REGION || DEFAULT_REGION,
+    endpoint: process.env.B2_ENDPOINT || DEFAULT_ENDPOINT,
   };
 }
 

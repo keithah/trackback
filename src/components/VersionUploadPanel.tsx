@@ -89,7 +89,16 @@ export default function VersionUploadPanel({
           resetForm();
           router.refresh();
         } else {
-          setError("Unable to upload file.");
+          let message = "Unable to upload file.";
+          try {
+            const payload = JSON.parse(xhr.responseText ?? "{}");
+            if (payload?.error) {
+              message = payload.error;
+            }
+          } catch {
+            // ignore JSON parse errors
+          }
+          setError(message);
           setIsSubmitting(false);
         }
         resolve();

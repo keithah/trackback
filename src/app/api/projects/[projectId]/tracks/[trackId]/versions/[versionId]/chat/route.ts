@@ -41,15 +41,32 @@ const chatSchema = z.object({
 
 export async function GET(
   _: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  {
+    params,
+  }: {
+    params: Promise<{ projectId: string; trackId: string; versionId: string }>;
+  }
 ) {
   try {
-    const { projectId } = await params;
+    const { projectId, trackId, versionId } = await params;
     const userId = await requireUserId();
     await requireProjectMember(userId, projectId);
 
+    const version = await prisma.version.findFirst({
+      where: {
+        id: versionId,
+        trackId,
+        track: { projectId },
+      },
+      select: { id: true },
+    });
+
+    if (!version) {
+      return jsonError("Not found", 404);
+    }
+
     const messages = await prisma.chatMessage.findMany({
-      where: { projectId },
+      where: { trackId, versionId },
       orderBy: { createdAt: "asc" },
       select: {
         id: true,
@@ -75,10 +92,14 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  {
+    params,
+  }: {
+    params: Promise<{ projectId: string; trackId: string; versionId: string }>;
+  }
 ) {
   try {
-    const { projectId } = await params;
+    const { projectId, trackId, versionId } = await params;
     const userId = await requireUserId();
     await requireProjectMember(userId, projectId);
 
@@ -97,9 +118,23 @@ export async function POST(
       );
     }
 
+    const version = await prisma.version.findFirst({
+      where: {
+        id: versionId,
+        trackId,
+        track: { projectId },
+      },
+      select: { id: true },
+    });
+
+    if (!version) {
+      return jsonError("Not found", 404);
+    }
+
     const message = await prisma.chatMessage.create({
       data: {
-        projectId,
+        trackId,
+        versionId,
         userId,
         body: parsed.data.body,
       },

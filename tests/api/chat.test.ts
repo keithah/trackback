@@ -11,7 +11,9 @@ vi.mock("@/lib/auth", () => ({
   requireSession: async () => sessionState,
 }));
 
-const { GET, POST } = await import("@/app/api/projects/[projectId]/chat/route");
+const { GET, POST } = await import(
+  "@/app/api/projects/[projectId]/tracks/[trackId]/versions/[versionId]/chat/route"
+);
 const { prisma } = await import("@/db/prisma");
 
 describe("chat API", () => {
@@ -30,19 +32,47 @@ describe("chat API", () => {
       },
     });
 
+    const track = await prisma.track.create({
+      data: {
+        projectId: project.id,
+        name: "Chat track",
+        versions: {
+          create: {
+            name: "Initial",
+            isCurrent: true,
+          },
+        },
+      },
+      select: { id: true, versions: { select: { id: true }, take: 1 } },
+    });
+
+    const versionId = track.versions[0]?.id;
+
+    expect(versionId).toBeTruthy();
+
     const createResponse = await POST(
       new Request("http://localhost", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ body: "Hello team" }),
       }),
-      { params: Promise.resolve({ projectId: project.id }) }
+      {
+        params: Promise.resolve({
+          projectId: project.id,
+          trackId: track.id,
+          versionId: versionId as string,
+        }),
+      }
     );
 
     expect(createResponse.status).toBe(201);
 
     const listResponse = await GET(new Request("http://localhost"), {
-      params: Promise.resolve({ projectId: project.id }),
+      params: Promise.resolve({
+        projectId: project.id,
+        trackId: track.id,
+        versionId: versionId as string,
+      }),
     });
     const listPayload = await listResponse.json();
 

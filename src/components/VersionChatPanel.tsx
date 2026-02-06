@@ -14,18 +14,26 @@ type ChatMessage = {
   };
 };
 
-type ProjectChatPanelProps = {
+type VersionChatPanelProps = {
   projectId: string;
+  trackId: string;
+  versionId: string;
 };
 
-export default function ProjectChatPanel({ projectId }: ProjectChatPanelProps) {
+export default function VersionChatPanel({
+  projectId,
+  trackId,
+  versionId,
+}: VersionChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadMessages = useCallback(async () => {
-    const response = await fetch(`/api/projects/${projectId}/chat`);
+    const response = await fetch(
+      `/api/projects/${projectId}/tracks/${trackId}/versions/${versionId}/chat`
+    );
 
     if (!response.ok) {
       setError("Unable to load chat history.");
@@ -35,7 +43,7 @@ export default function ProjectChatPanel({ projectId }: ProjectChatPanelProps) {
     const payload = await response.json();
     setMessages(payload?.messages ?? []);
     setError(null);
-  }, [projectId]);
+  }, [projectId, trackId, versionId]);
 
   useEffect(() => {
     void loadMessages();
@@ -50,11 +58,14 @@ export default function ProjectChatPanel({ projectId }: ProjectChatPanelProps) {
     setIsSubmitting(true);
     setError(null);
 
-    const response = await fetch(`/api/projects/${projectId}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: body.trim() }),
-    });
+    const response = await fetch(
+      `/api/projects/${projectId}/tracks/${trackId}/versions/${versionId}/chat`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: body.trim() }),
+      }
+    );
 
     setIsSubmitting(false);
 
@@ -71,7 +82,7 @@ export default function ProjectChatPanel({ projectId }: ProjectChatPanelProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-          Project chat
+          Version chat
         </h2>
       </div>
       <div className="space-y-3">

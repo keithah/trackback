@@ -74,12 +74,29 @@ export async function POST(
       return jsonError("Not found", 404);
     }
 
-    const recentMessages = await prisma.chatMessage.findMany({
-      where: { projectId },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { body: true, createdAt: true, user: { select: { name: true } } },
-    });
+    const versionForNotes = parsed.data.versionId
+      ? await prisma.version.findFirst({
+          where: {
+            id: parsed.data.versionId,
+            trackId: parsed.data.trackId,
+            track: { projectId },
+          },
+          select: { id: true },
+        })
+      : await prisma.version.findFirst({
+          where: { trackId: parsed.data.trackId },
+          orderBy: { createdAt: "desc" },
+          select: { id: true },
+        });
+
+    const recentMessages = versionForNotes
+      ? await prisma.chatMessage.findMany({
+          where: { trackId: parsed.data.trackId, versionId: versionForNotes.id },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: { body: true, createdAt: true, user: { select: { name: true } } },
+        })
+      : [];
 
     const generated =
       recentMessages.length > 0

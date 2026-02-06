@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import AudioPlayer from "@/components/AudioPlayer";
 import VersionCompare from "@/components/VersionCompare";
+import VersionChatPanel from "@/components/VersionChatPanel";
 
 type VersionItem = {
   id: string;
@@ -132,6 +133,13 @@ export default function VersionList({
         <VersionCompare
           left={compareVersions[0] as VersionItem}
           right={compareVersions[1] as VersionItem}
+        />
+      ) : null}
+      {selectedVersion ? (
+        <VersionChatPanel
+          projectId={projectId}
+          trackId={trackId}
+          versionId={selectedVersion.id}
         />
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">

@@ -5,7 +5,6 @@ import { prisma } from "@/db/prisma";
 import TrackCard from "@/components/TrackCard";
 import TrackCreateModal from "@/components/TrackCreateModal";
 import InviteModal from "@/components/InviteModal";
-import ProjectChatPanel from "@/components/ProjectChatPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -202,15 +201,6 @@ export default async function ProjectPage({
                 Finished tracks will appear once they are mastered or released.
               </p>
             )}
-          </section>
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl font-semibold">Chat</h2>
-              <span className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]">
-                Project conversation
-              </span>
-            </div>
-            <ProjectChatPanel projectId={project.id} />
           </section>
         </div>
       ) : (

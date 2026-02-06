@@ -19,7 +19,9 @@ export default function TrackCreateModal({
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
   const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [createdTrackId, setCreatedTrackId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -32,7 +34,9 @@ export default function TrackCreateModal({
     setName("");
     setNotes("");
     setUrl("");
+    setFile(null);
     setError(null);
+    setCreatedTrackId(null);
     setIsSubmitting(false);
   };
 
@@ -48,6 +52,13 @@ export default function TrackCreateModal({
       return;
     }
 
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl && !file) {
+      setError("Add an audio link or upload a file.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -58,7 +69,7 @@ export default function TrackCreateModal({
         body: JSON.stringify({
           name: name.trim(),
           notes: notes.trim() || undefined,
-          url: url.trim() || undefined
+          url: trimmedUrl || undefined
         })
       });
 
@@ -76,6 +87,38 @@ export default function TrackCreateModal({
         setError("Track created but response was incomplete.");
         setIsSubmitting(false);
         return;
+      }
+
+      setCreatedTrackId(trackId);
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        if (name.trim()) {
+          formData.append("name", name.trim());
+        }
+        if (notes.trim()) {
+          formData.append("notes", notes.trim());
+        }
+
+        const uploadResponse = await fetch(
+          `/api/projects/${projectId}/tracks/${trackId}/versions/upload`,
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        const uploadPayload = await uploadResponse.json().catch(() => null);
+
+        if (!uploadResponse.ok) {
+          setError(
+            uploadPayload?.error ??
+              "Track created, but upload failed. Open the track to retry."
+          );
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       router.push(`/projects/${projectId}/tracks/${trackId}`);
@@ -145,7 +188,7 @@ export default function TrackCreateModal({
                 />
               </label>
               <label className="block text-sm font-medium text-[color:var(--color-text)]">
-                Audio link (optional)
+                Audio link
                 <input
                   type="url"
                   value={url}
@@ -154,8 +197,31 @@ export default function TrackCreateModal({
                   placeholder="https://soundcloud.com/..."
                 />
               </label>
+              <label className="block text-sm font-medium text-[color:var(--color-text)]">
+                Upload audio (required if no link)
+                <input
+                  type="file"
+                  accept=".wav,.aiff,.aif,.flac,audio/wav,audio/x-wav,audio/aiff,audio/x-aiff,audio/flac,audio/x-flac"
+                  onChange={(event) =>
+                    setFile(event.target.files?.[0] ?? null)
+                  }
+                  className="mt-2 w-full rounded-2xl border border-[color:var(--color-border)] bg-white px-4 py-3 text-sm text-[color:var(--color-text)] shadow-sm file:mr-4 file:rounded-full file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white"
+                />
+                <span className="mt-2 block text-xs text-[color:var(--color-text-muted)]">
+                  WAV, AIFF, or FLAC.
+                </span>
+              </label>
               {error ? (
                 <p className="text-sm text-red-600">{error}</p>
+              ) : null}
+              {createdTrackId ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(`/projects/${projectId}/tracks/${createdTrackId}`)}
+                  className="text-xs uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] underline-offset-4 hover:underline"
+                >
+                  Open track
+                </button>
               ) : null}
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <p className="text-xs text-[color:var(--color-text-muted)]">

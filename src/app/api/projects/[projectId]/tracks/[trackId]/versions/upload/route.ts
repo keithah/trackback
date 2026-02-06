@@ -159,12 +159,35 @@ export async function POST(
 
     return NextResponse.json({ version }, { status: 201 });
   } catch (error) {
+    console.error("Version upload error", error);
     if (error instanceof PermissionError) {
       return jsonError("Forbidden", 403);
     }
 
     if (error instanceof Error && error.message === "Unauthorized") {
       return jsonError("Unauthorized", 401);
+    }
+
+    if (error instanceof Error) {
+      if (error.message.startsWith("Missing B2_")) {
+        return jsonError("Storage is not configured", 500);
+      }
+
+      if (
+        /AccessDenied|InvalidAccessKeyId|SignatureDoesNotMatch|CredentialsProviderError/i.test(
+          error.message
+        )
+      ) {
+        return jsonError("Storage credentials rejected", 500);
+      }
+
+      if (/NoSuchBucket/i.test(error.message)) {
+        return jsonError("Storage bucket not found", 500);
+      }
+
+      if (/PermanentRedirect/i.test(error.message)) {
+        return jsonError("Storage endpoint or region mismatch", 500);
+      }
     }
 
     return jsonError("Internal server error", 500);
