@@ -50,6 +50,7 @@ Non-technical collaborators can move from demo to feedback to finalized notes in
 | Notes auto-generated from conversation in v1 | Reduce manual overhead and capture decisions reliably | — Pending |
 | Private collaboration now, export later | Avoid premature public exposure while keeping future option | — Pending |
 | Minimal permissions in v1 | Reduce complexity; only author deletes, invites are open | — Pending |
+| V1 auth method | MVP is developer-only access; avoid email deliverability risk while keeping invites aligned later | GitHub OAuth via Auth.js for MVP; switch to magic link + Resend after MVP |
 
 ---
 *Last updated: 2026-02-05 after initialization*
