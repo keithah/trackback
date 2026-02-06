@@ -81,6 +81,11 @@ export default async function ProjectPage({
     name: string;
     status: TrackStatus;
     updatedAt: Date;
+    versions: Array<{
+      id: string;
+      name: string;
+      createdAt: Date;
+    }>;
   }> = await prisma.track.findMany({
     where: { projectId: params.projectId },
     orderBy: { updatedAt: "desc" },
@@ -88,7 +93,16 @@ export default async function ProjectPage({
       id: true,
       name: true,
       status: true,
-      updatedAt: true
+      updatedAt: true,
+      versions: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true
+        },
+        orderBy: { createdAt: "desc" },
+        take: 1
+      }
     }
   });
 
@@ -143,6 +157,7 @@ export default async function ProjectPage({
                     name={track.name}
                     status={track.status}
                     updatedAt={track.updatedAt}
+                    latestVersion={track.versions[0] ?? null}
                   />
                 ))}
               </div>
@@ -169,6 +184,7 @@ export default async function ProjectPage({
                     name={track.name}
                     status={track.status}
                     updatedAt={track.updatedAt}
+                    latestVersion={track.versions[0] ?? null}
                   />
                 ))}
               </div>

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -108,9 +108,20 @@ model Track {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions Version[]
 
   @@unique([projectId, name])
+}
+
+model Version {
+  id        String   @id @default(cuid())
+  trackId   String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
 }
 
 model Invite {

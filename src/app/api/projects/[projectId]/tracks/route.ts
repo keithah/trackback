@@ -113,6 +113,11 @@ export async function POST(
           name,
           notes,
           status: status ?? project.defaultTrackStatus,
+          versions: {
+            create: {
+              name: "Initial version",
+            },
+          },
         },
       }),
       prisma.project.update({

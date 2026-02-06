@@ -8,6 +8,10 @@ type TrackCardProps = {
   name: string;
   status: TrackStatus;
   updatedAt: Date | string;
+  latestVersion?: {
+    name: string;
+    createdAt: Date | string;
+  } | null;
 };
 
 const statusLabels: Record<TrackStatus, string> = {
@@ -40,7 +44,8 @@ export default function TrackCard({
   projectId,
   name,
   status,
-  updatedAt
+  updatedAt,
+  latestVersion
 }: TrackCardProps) {
   return (
     <Link
@@ -55,15 +60,27 @@ export default function TrackCard({
           {name}
         </h3>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-        <span
-          className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.2em] ${statusBadge[status]}`}
-        >
-          {statusLabels[status]}
-        </span>
-        <span className="text-[color:var(--color-text-muted)]">
-          Updated {formatDate(updatedAt)}
-        </span>
+      <div className="space-y-2 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span
+            className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.2em] ${statusBadge[status]}`}
+          >
+            {statusLabels[status]}
+          </span>
+          <span className="text-[color:var(--color-text-muted)]">
+            Updated {formatDate(updatedAt)}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[color:var(--color-text-muted)]">
+          <span className="text-[0.65rem] uppercase tracking-[0.35em]">
+            Latest version
+          </span>
+          <span>
+            {latestVersion
+              ? `${latestVersion.name} • ${formatDate(latestVersion.createdAt)}`
+              : "No versions yet"}
+          </span>
+        </div>
       </div>
     </Link>
   );

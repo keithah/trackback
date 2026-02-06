@@ -162,3 +162,71 @@ export function TrackDeleteButton({
     </div>
   );
 }
+
+type VersionDeleteButtonProps = {
+  projectId: string;
+  trackId: string;
+  versionId: string;
+  versionName?: string | null;
+};
+
+export function VersionDeleteButton({
+  projectId,
+  trackId,
+  versionId,
+  versionName
+}: VersionDeleteButtonProps) {
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    const label = versionName ? `"${versionName}"` : "this version";
+    const confirmed = window.confirm(
+      `Delete ${label}? This cannot be undone.`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/projects/${projectId}/tracks/${trackId}/versions/${versionId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        setError(payload?.error ?? "Unable to delete version.");
+        setIsDeleting(false);
+        return;
+      }
+
+      router.refresh();
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Unable to delete version."
+      );
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="rounded-full border border-red-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-red-600 transition hover:border-red-300 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {isDeleting ? "Deleting..." : "Delete version"}
+      </button>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+    </div>
+  );
+}

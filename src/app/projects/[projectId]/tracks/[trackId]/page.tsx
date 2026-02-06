@@ -4,7 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import TrackStatusSelect, {
-  TrackDeleteButton
+  TrackDeleteButton,
+  VersionDeleteButton
 } from "@/components/TrackStatusSelect";
 
 type TrackStatus = "DEMO" | "MIXING" | "MASTERED" | "RELEASED";
@@ -72,6 +73,15 @@ export default async function TrackPage({
       notes: true,
       status: true,
       updatedAt: true,
+      versions: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true
+        },
+        orderBy: { createdAt: "desc" },
+        take: 1
+      },
       project: {
         select: { name: true }
       }
@@ -83,6 +93,7 @@ export default async function TrackPage({
   }
 
   const isOwner = membership.role === "OWNER";
+  const latestVersion = track.versions[0] ?? null;
 
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-12">
@@ -117,6 +128,37 @@ export default async function TrackPage({
               ? track.notes
               : "No notes added yet. Capture the latest requests or creative decisions."}
           </p>
+        </div>
+        <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
+                Latest version
+              </h2>
+              {latestVersion ? (
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium text-[color:var(--color-text)]">
+                    {latestVersion.name}
+                  </p>
+                  <p className="text-[color:var(--color-text-muted)]">
+                    Added {latestVersion.createdAt.toLocaleDateString("en-US")}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-[color:var(--color-text-muted)]">
+                  No versions yet.
+                </p>
+              )}
+            </div>
+            {isOwner && latestVersion ? (
+              <VersionDeleteButton
+                projectId={params.projectId}
+                trackId={track.id}
+                versionId={latestVersion.id}
+                versionName={latestVersion.name}
+              />
+            ) : null}
+          </div>
         </div>
         {isOwner ? (
           <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">

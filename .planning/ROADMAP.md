@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can set and view each track's status (demo, mixing, mastered, released).
   4. User can invite collaborators to a project by email or username.
   5. Only the project owner can delete tracks or versions.
-**Plans**: 6 plans
+**Plans**: 7 plans
 
 Plans:
 - [x] 01-01-PLAN.md — Decide v1 authentication method
@@ -39,6 +39,7 @@ Plans:
 - [x] 01-04-PLAN.md — Implement project/track/invite API routes
 - [x] 01-05-PLAN.md — Create Phase 1 UI shell and sign-in
 - [x] 01-06-PLAN.md — Build project dashboard, tracks, and invites UI
+- [x] 01-07-PLAN.md — Close Phase 1 version gap (model + delete + UI)
 
 ### Phase 2: Media Ingest & Playback
 **Goal**: Users can upload or link demos and play them with rich audio context
@@ -105,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Projects & Access | 6/6 | Complete | 2026-02-06 |
+| 1. Projects & Access | 7/7 | Complete | 2026-02-06 |
 | 2. Media Ingest & Playback | 0/TBD | Not started | - |
 | 3. Timeline Feedback | 0/TBD | Not started | - |
 | 4. Version History & Sessions | 0/TBD | Not started | - |
