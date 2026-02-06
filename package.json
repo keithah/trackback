@@ -6,20 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:db": "DATABASE_URL=\"file:./test.db\" prisma db push --skip-generate",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
+    "@aws-sdk/client-s3": "^3.984.0",
+    "@aws-sdk/s3-request-presigner": "^3.984.0",
     "@prisma/client": "^6.19.2",
+    "music-metadata": "^10.7.4",
     "next": "^15.1.6",
     "next-auth": "^4.24.13",
     "prisma": "^6.19.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "resend": "^6.9.1",
+    "wavesurfer.js": "^7.7.7",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.50.0",
     "@types/node": "^20.11.30",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -28,6 +37,7 @@
     "eslint-config-next": "^15.1.6",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.1.9"
   }
 }
