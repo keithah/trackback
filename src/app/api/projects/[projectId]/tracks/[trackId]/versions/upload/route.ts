@@ -114,7 +114,9 @@ export async function POST(
     }
 
     const versionName =
-      typeof name === "string" && name.trim() ? name.trim() : fileValue.name;
+      typeof name === "string" && name.trim()
+        ? name.trim()
+        : fileValue.name || "Audio upload";
     const versionNotes =
       typeof notes === "string" && notes.trim() ? notes.trim() : undefined;
 
