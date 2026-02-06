@@ -15,7 +15,7 @@ function jsonError(message: string, status: number) {
 
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return { userId: directId, session }
@@ -41,11 +41,12 @@ async function requireUserId() {
 
 export async function POST(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params
     const { userId, session } = await requireUserId()
-    await requireProjectMember(userId, params.projectId)
+    await requireProjectMember(userId, projectId)
     const body = await request.json().catch(() => null)
 
     if (!body) {
@@ -66,7 +67,7 @@ export async function POST(
     if (username) {
       const targetUser = await prisma.user.findFirst({
         where: {
-          name: { equals: username, mode: "insensitive" },
+          name: { equals: username },
         },
         select: { id: true },
       })
@@ -75,7 +76,7 @@ export async function POST(
         const existingMembership = await prisma.membership.findUnique({
           where: {
             projectId_userId: {
-              projectId: params.projectId,
+              projectId,
               userId: targetUser.id,
             },
           },
@@ -90,7 +91,7 @@ export async function POST(
 
         const membership = await prisma.membership.create({
           data: {
-            projectId: params.projectId,
+            projectId,
             userId: targetUser.id,
             role: "COLLABORATOR",
           },
@@ -109,7 +110,7 @@ export async function POST(
     const invite = await prisma.invite.create({
       data: {
         token,
-        projectId: params.projectId,
+        projectId,
         invitedById: userId,
         targetEmail: email,
         expiresAt,

@@ -10,7 +10,7 @@ function jsonError(message: string, status: number) {
 
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return directId

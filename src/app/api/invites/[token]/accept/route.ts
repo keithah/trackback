@@ -9,7 +9,7 @@ function jsonError(message: string, status: number) {
 
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return directId
@@ -35,12 +35,13 @@ async function requireUserId() {
 
 export async function POST(
   _: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
+    const { token } = await params
     const userId = await requireUserId()
     const invite = await prisma.invite.findUnique({
-      where: { token: params.token },
+      where: { token },
     })
 
     if (!invite) {

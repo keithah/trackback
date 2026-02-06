@@ -10,7 +10,7 @@ function jsonError(message: string, status: number) {
 
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return directId
@@ -38,16 +38,19 @@ export async function DELETE(
   _: Request,
   {
     params,
-  }: { params: { projectId: string; trackId: string; versionId: string } }
+  }: {
+    params: Promise<{ projectId: string; trackId: string; versionId: string }>
+  }
 ) {
   try {
+    const { projectId, trackId, versionId } = await params
     const userId = await requireUserId()
 
     const version = await prisma.version.findFirst({
       where: {
-        id: params.versionId,
-        trackId: params.trackId,
-        track: { projectId: params.projectId },
+        id: versionId,
+        trackId,
+        track: { projectId },
       },
       select: { id: true },
     })
@@ -56,13 +59,67 @@ export async function DELETE(
       return jsonError("Not found", 404)
     }
 
-    await requireProjectOwner(userId, params.projectId)
+    await requireProjectOwner(userId, projectId)
 
     await prisma.version.delete({
-      where: { id: params.versionId },
+      where: { id: versionId },
     })
 
     return NextResponse.json({ ok: true })
+  } catch (error) {
+    if (error instanceof PermissionError) {
+      return jsonError("Forbidden", 403)
+    }
+
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return jsonError("Unauthorized", 401)
+    }
+
+    return jsonError("Internal server error", 500)
+  }
+}
+
+export async function PATCH(
+  _: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ projectId: string; trackId: string; versionId: string }>
+  }
+) {
+  try {
+    const { projectId, trackId, versionId } = await params
+    const userId = await requireUserId()
+
+    const version = await prisma.version.findFirst({
+      where: {
+        id: versionId,
+        trackId,
+        track: { projectId },
+      },
+      select: { id: true },
+    })
+
+    if (!version) {
+      return jsonError("Not found", 404)
+    }
+
+    await requireProjectOwner(userId, projectId)
+
+    const transactionResult = await prisma.$transaction([
+      prisma.version.updateMany({
+        where: { trackId },
+        data: { isCurrent: false },
+      }),
+      prisma.version.update({
+        where: { id: versionId },
+        data: { isCurrent: true },
+      }),
+    ])
+
+    const updated = transactionResult[1]
+
+    return NextResponse.json({ version: updated })
   } catch (error) {
     if (error instanceof PermissionError) {
       return jsonError("Forbidden", 403)

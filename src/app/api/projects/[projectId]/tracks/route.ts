@@ -9,9 +9,22 @@ function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status })
 }
 
+function jsonErrorWithDebug(message: string, status: number, error: unknown) {
+  if (process.env.NODE_ENV === "production") {
+    return jsonError(message, status)
+  }
+
+  const detail =
+    error instanceof Error
+      ? { name: error.name, message: error.message, stack: error.stack }
+      : { message: String(error) }
+
+  return NextResponse.json({ error: message, detail }, { status })
+}
+
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return directId
@@ -37,19 +50,21 @@ async function requireUserId() {
 
 export async function GET(
   _: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params
     const userId = await requireUserId()
-    await requireProjectMember(userId, params.projectId)
+    await requireProjectMember(userId, projectId)
 
     const tracks = await prisma.track.findMany({
-      where: { projectId: params.projectId },
+      where: { projectId },
       orderBy: { updatedAt: "desc" },
     })
 
     return NextResponse.json({ tracks })
   } catch (error) {
+    console.error("Track create error", error)
     if (error instanceof PermissionError) {
       return jsonError("Forbidden", 403)
     }
@@ -58,17 +73,18 @@ export async function GET(
       return jsonError("Unauthorized", 401)
     }
 
-    return jsonError("Internal server error", 500)
+    return jsonErrorWithDebug("Internal server error", 500, error)
   }
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params
     const userId = await requireUserId()
-    await requireProjectMember(userId, params.projectId)
+    await requireProjectMember(userId, projectId)
     const body = await request.json().catch(() => null)
 
     if (!body) {
@@ -84,11 +100,11 @@ export async function POST(
       )
     }
 
-    const { name, notes, status } = parsed.data
+    const { name, notes, status, url } = parsed.data
     const existing = await prisma.track.findFirst({
       where: {
-        projectId: params.projectId,
-        name: { equals: name, mode: "insensitive" },
+        projectId,
+        name: { equals: name },
       },
       select: { id: true },
     })
@@ -98,7 +114,7 @@ export async function POST(
     }
 
     const project = await prisma.project.findUnique({
-      where: { id: params.projectId },
+      where: { id: projectId },
       select: { defaultTrackStatus: true },
     })
 
@@ -109,25 +125,28 @@ export async function POST(
     const [track] = await prisma.$transaction([
       prisma.track.create({
         data: {
-          projectId: params.projectId,
+          projectId,
           name,
           notes,
+          url,
           status: status ?? project.defaultTrackStatus,
           versions: {
             create: {
               name: "Initial version",
+              isCurrent: true,
             },
           },
         },
       }),
       prisma.project.update({
-        where: { id: params.projectId },
+        where: { id: projectId },
         data: { updatedAt: new Date() },
       }),
     ])
 
     return NextResponse.json({ track }, { status: 201 })
   } catch (error) {
+    console.error("Track create error", error)
     if (error instanceof PermissionError) {
       return jsonError("Forbidden", 403)
     }
@@ -136,6 +155,6 @@ export async function POST(
       return jsonError("Unauthorized", 401)
     }
 
-    return jsonError("Internal server error", 500)
+    return jsonErrorWithDebug("Internal server error", 500, error)
   }
 }

@@ -11,7 +11,7 @@ function jsonError(message: string, status: number) {
 
 async function requireUserId() {
   const session = await requireSession()
-  const directId = session.user?.id
+  const directId = (session.user as { id?: string } | undefined)?.id
 
   if (directId) {
     return directId
@@ -37,11 +37,12 @@ async function requireUserId() {
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { projectId: string; trackId: string } }
+  { params }: { params: Promise<{ projectId: string; trackId: string }> }
 ) {
   try {
+    const { projectId, trackId } = await params
     const userId = await requireUserId()
-    await requireProjectMember(userId, params.projectId)
+    await requireProjectMember(userId, projectId)
     const body = await request.json().catch(() => null)
 
     if (!body) {
@@ -59,8 +60,8 @@ export async function PATCH(
 
     const track = await prisma.track.findFirst({
       where: {
-        id: params.trackId,
-        projectId: params.projectId,
+        id: trackId,
+        projectId,
       },
     })
 
@@ -70,11 +71,11 @@ export async function PATCH(
 
     const [updated] = await prisma.$transaction([
       prisma.track.update({
-        where: { id: params.trackId },
+        where: { id: trackId },
         data: { status: parsed.data.status },
       }),
       prisma.project.update({
-        where: { id: params.projectId },
+        where: { id: projectId },
         data: { updatedAt: new Date() },
       }),
     ])
@@ -95,16 +96,17 @@ export async function PATCH(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { projectId: string; trackId: string } }
+  { params }: { params: Promise<{ projectId: string; trackId: string }> }
 ) {
   try {
+    const { projectId, trackId } = await params
     const userId = await requireUserId()
-    await requireProjectOwner(userId, params.projectId)
+    await requireProjectOwner(userId, projectId)
 
     const track = await prisma.track.findFirst({
       where: {
-        id: params.trackId,
-        projectId: params.projectId,
+        id: trackId,
+        projectId,
       },
       select: { id: true },
     })
@@ -115,10 +117,10 @@ export async function DELETE(
 
     await prisma.$transaction([
       prisma.track.delete({
-        where: { id: params.trackId },
+        where: { id: trackId },
       }),
       prisma.project.update({
-        where: { id: params.projectId },
+        where: { id: projectId },
         data: { updatedAt: new Date() },
       }),
     ])
